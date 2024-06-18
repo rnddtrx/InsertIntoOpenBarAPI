@@ -20,16 +20,48 @@ def insert_ingredient(name):
     except requests.exceptions.RequestException as e:
         print("Error:", e)
 
-def generate_random_recipe_name():
+# def generate_random_recipe_name():
+#     try:
+#         response = requests.get("https://random-word-api.herokuapp.com/word?number=2")
+#         if response.status_code == 200:
+#             words = response.json()
+#             return ' '.join(words)
+#         else:
+#             print("Failed to fetch random words. Status code:", response.status_code)
+#     except requests.exceptions.RequestException as e:
+#         print("Error:", e)
+
+
+def get_random_word():
+    url = "https://api.datamuse.com/words"
+    params = {
+        'ml': 'food'  # Use a common word related to food to get a list of similar words
+    }
+
     try:
-        response = requests.get("https://random-word-api.herokuapp.com/word?number=2")
+        response = requests.get(url, params=params)
         if response.status_code == 200:
             words = response.json()
-            return ' '.join(words)
+            if words:
+                # Randomly select a word from the list
+                word = random.choice(words).get("word")
+                return word
+            else:
+                print("No words found.")
+                return None
         else:
-            print("Failed to fetch random words. Status code:", response.status_code)
+            print("Failed to fetch word. Status code:", response.status_code)
+            return None
     except requests.exceptions.RequestException as e:
         print("Error:", e)
+        return None
+
+def generate_random_recipe_name():
+    words = [get_random_word() for _ in range(2)]
+    if all(words):
+        return ' '.join(words)
+    else:
+        return None
 
 def generate_random_step_description():
     try:
